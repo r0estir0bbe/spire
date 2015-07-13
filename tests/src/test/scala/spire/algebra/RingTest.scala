@@ -6,7 +6,7 @@ import scala.reflect.ClassTag
 import org.scalatest.FunSuite
 
 // we need to disable our own === to avoid messing up ScalaTest.
-import spire.math.{Rational, Complex, Jet, JetDim}
+import spire.math.{Rational, Complex, Jet, JetDim, ULong}
 import spire.implicits.{eqOps => _, _}
 
 // nice alias
@@ -72,6 +72,7 @@ class RingTest extends FunSuite {
   // here's where we actually run all the tests, for each type we care about.
   runWith[Int]("Int")(-3, 3, -9)
   runWith[Long]("Long")(-3, 3, -9)
+  runWith[ULong]("ULong")(ULong(-3), ULong(3), ULong(-9))
   runWith[Float]("Float")(-3, 3, -9)
   runWith[Double]("Double")(-3, 3, -9)
   runWith[BigInt]("BigInt")(-3, 3, -9)

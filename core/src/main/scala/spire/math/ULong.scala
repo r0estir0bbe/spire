@@ -2,7 +2,8 @@ package spire.math
 
 import scala.annotation.tailrec
 
-import spire.algebra.{IsIntegral, Order, Rig, Signed}
+import spire.algebra.{EuclideanRing, IsIntegral, NRoot, Order, Ring, Signed}
+import spire.std.bigInt._
 
 object ULong extends ULongInstances {
   @inline final def apply(n: Long): ULong = new ULong(n)
@@ -134,8 +135,10 @@ trait ULongInstances {
   implicit final val ULongTag = new UnsignedIntTag[ULong](ULong.MinValue, ULong.MaxValue)
 }
 
-private[math] trait ULongIsRig extends Rig[ULong] {
-  def one: ULong = ULong(1)
+private[math] trait ULongIsRing extends Ring[ULong] {
+  override def minus(a:ULong, b:ULong): ULong = a - b
+  def negate(a:ULong): ULong = -a
+  val one: ULong = ULong(1)
   def plus(a:ULong, b:ULong): ULong = a + b
   override def pow(a:ULong, b:Int): ULong = {
     if (b < 0)
@@ -144,7 +147,22 @@ private[math] trait ULongIsRig extends Rig[ULong] {
   }
   override def times(a:ULong, b:ULong): ULong = a * b
   def zero: ULong = ULong(0)
+
+  override def fromInt(n: Int): ULong = ULong(n)
 }
+
+private[math] trait ULongIsEuclideanRing extends EuclideanRing[ULong] with ULongIsRing {
+  def quot(a:ULong, b:ULong): ULong = a / b
+  def mod(a:ULong, b:ULong): ULong = a % b
+  override def quotmod(a:ULong, b:ULong): (ULong, ULong) = a /% b
+  def gcd(a:ULong, b:ULong): ULong = a gcd b
+}
+
+private[math] trait ULongIsNRoot extends NRoot[ULong] {
+  def nroot(a: ULong, k: Int): ULong = ULong.fromBigInt(NRoot[BigInt].nroot(a.toBigInt, k))
+  def fpow(a: ULong, b: ULong): ULong = ULong.fromBigInt(NRoot[BigInt].fpow(a.toBigInt, b.toBigInt))
+}
+
 
 private[math] trait ULongOrder extends Order[ULong] {
   override def eqv(x:ULong, y:ULong): Boolean = x == y
@@ -192,5 +210,16 @@ private[math] trait ULongIsReal extends IsIntegral[ULong] with ULongOrder with U
   def toBigInt(n: ULong): BigInt = n.toBigInt
 }
 
+private[math] trait ULongIsNumeric extends Numeric[ULong] with ULongIsReal with ConvertableToULong with ConvertableFromULong {
+  override def fromInt(n: Int): ULong = ULong(n)
+  override def fromDouble(n: Double): ULong = ULong(n.toLong)
+  override def toDouble(n: ULong): Double = n.toDouble
+  override def toRational(n: ULong): Rational = super[ULongIsReal].toRational(n)
+  override def toAlgebraic(n: ULong): Algebraic = super[ULongIsReal].toAlgebraic(n)
+  override def toReal(n: ULong): Real = super[ULongIsReal].toReal(n)
+  override def toBigInt(n: ULong): BigInt = super[ULongIsReal].toBigInt(n)
+  def div(a: ULong, b: ULong): ULong = a / b
+}
+
 @SerialVersionUID(0L)
-private[math] class ULongAlgebra extends ULongIsRig with ULongIsReal with Serializable
+private[math] class ULongAlgebra extends ULongIsEuclideanRing with ULongIsNRoot with ULongIsNumeric with Serializable

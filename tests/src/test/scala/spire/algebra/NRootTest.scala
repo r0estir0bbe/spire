@@ -19,6 +19,7 @@ class NRootTest extends FunSuite {
 
   testIntegralNRoot[Int]
   testIntegralNRoot[Long]
+  testIntegralNRoot[ULong]
   testIntegralNRoot[BigInt]
 
   val DECIMAL1 = new java.math.MathContext(1)

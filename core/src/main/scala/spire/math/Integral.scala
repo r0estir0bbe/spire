@@ -12,6 +12,7 @@ object Integral {
   implicit final val LongIsIntegral = new LongIsIntegral
   implicit final val BigIntIsIntegral = new BigIntIsIntegral
   implicit final val SafeLongIsIntegral = new SafeLongIsIntegral
+  implicit final val ULongIsIntegral = new ULongIsIntegral
 
   @inline final def apply[A](implicit ev: Integral[A]): Integral[A] = ev
 }
@@ -74,4 +75,16 @@ with ConvertableFromSafeLong with ConvertableToSafeLong with SafeLongIsReal with
   override def toAlgebraic(n: SafeLong): Algebraic = super[SafeLongIsReal].toAlgebraic(n)
   override def toReal(n: SafeLong): Real = super[SafeLongIsReal].toReal(n)
   override def toBigInt(n: SafeLong): BigInt = super[SafeLongIsReal].toBigInt(n)
+}
+
+@SerialVersionUID(0L)
+private[math] class ULongIsIntegral extends Integral[ULong] with ULongIsEuclideanRing
+with ConvertableFromULong with ConvertableToULong
+with ULongIsReal with Serializable {
+  override def fromInt(n: Int): ULong = ULong(n)
+  override def toDouble(n: ULong): Double = n.toDouble
+  override def toRational(n: ULong): Rational = super[ULongIsReal].toRational(n)
+  override def toAlgebraic(n: ULong): Algebraic = super[ULongIsReal].toAlgebraic(n)
+  override def toReal(n: ULong): Real = super[ULongIsReal].toReal(n)
+  override def toBigInt(n: ULong): BigInt = super[ULongIsReal].toBigInt(n)
 }

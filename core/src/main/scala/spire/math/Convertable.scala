@@ -217,6 +217,22 @@ private[math] trait ConvertableToSafeLong extends ConvertableTo[SafeLong] {
   def fromType[B: ConvertableFrom](b: B): SafeLong = SafeLong(ConvertableFrom[B].toBigInt(b))
 }
 
+private[math] trait ConvertableToULong extends ConvertableTo[ULong] {
+  def fromByte(a: Byte): ULong = ULong(a.toInt)
+  def fromShort(a: Short): ULong = ULong(a.toInt)
+  def fromInt(a: Int): ULong = ULong(a)
+  def fromLong(a: Long): ULong = ULong(a)
+  def fromFloat(a: Float): ULong = ULong(a.toLong)
+  def fromDouble(a: Double): ULong = ULong(a.toLong)
+  def fromBigInt(a: BigInt): ULong = ULong.fromBigInt(a)
+  def fromBigDecimal(a: BigDecimal): ULong = ULong.fromBigInt(a.toBigInt)
+  def fromRational(a: Rational): ULong = if (a.isValidInt) ULong(a.toInt) else ULong.fromBigInt(a.toBigInt)
+  def fromAlgebraic(a: Algebraic): ULong = if (a.isValidInt) ULong(a.toInt) else ULong.fromBigInt(a.toBigInt)
+  def fromReal(a: Real): ULong = if (a.isValidInt) ULong(a.toInt) else fromRational(a.toRational)
+
+  def fromType[B: ConvertableFrom](b: B): ULong = ULong.fromBigInt(ConvertableFrom[B].toBigInt(b))
+}
+
 private[math] trait ConvertableToNumber extends ConvertableTo[Number] {
   def fromByte(a: Byte): Number = Number(a)
   def fromShort(a: Short): Number = Number(a)
@@ -264,6 +280,7 @@ object ConvertableTo {
   implicit final val ConvertableToRational = new ConvertableToRational {}
   implicit final val ConvertableToAlgebraic = new ConvertableToAlgebraic {}
   implicit final val ConvertableToSafeLong = new ConvertableToSafeLong {}
+  implicit final val ConvertableToULong = new ConvertableToULong {}
   implicit final val ConvertableToNumber = new ConvertableToNumber {}
   implicit final val ConvertableToNatural = new ConvertableToNatural {}
 
@@ -511,6 +528,24 @@ private[math] trait ConvertableFromSafeLong extends ConvertableFrom[SafeLong] {
   def toString(a: SafeLong): String = a.toString
 }
 
+private[math] trait ConvertableFromULong extends ConvertableFrom[ULong] {
+  def toByte(a: ULong): Byte = a.toBigInt.toByte
+  def toShort(a: ULong): Short = a.toBigInt.toShort
+  def toInt(a: ULong): Int = a.toBigInt.toInt
+  def toLong(a: ULong): Long = a.toBigInt.toLong
+  def toFloat(a: ULong): Float = a.toBigInt.toFloat
+  def toDouble(a: ULong): Double = a.toBigInt.toDouble
+  def toBigInt(a: ULong): BigInt = a.toBigInt
+  def toBigDecimal(a: ULong): BigDecimal = BigDecimal(a.toBigInt)
+  def toRational(a: ULong): Rational = Rational(a.toBigInt)
+  def toAlgebraic(a: ULong): Algebraic = Algebraic(a)
+  def toReal(a: ULong): Real = Real(a)
+  def toNumber(a: ULong): Number = Number(a)
+
+  def toType[B: ConvertableTo](a: ULong): B = ConvertableTo[B].fromBigInt(a.toBigInt)
+  def toString(a: ULong): String = a.toString
+}
+
 private[math] trait ConvertableFromNumber extends ConvertableFrom[Number] {
   def toByte(a: Number): Byte = a.toBigInt.toByte
   def toShort(a: Number): Short = a.toBigInt.toShort
@@ -562,6 +597,7 @@ object ConvertableFrom {
   implicit final val ConvertableFromRational = new ConvertableFromRational {}
   implicit final val ConvertableFromAlgebraic = new ConvertableFromAlgebraic {}
   implicit final val ConvertableFromSafeLong = new ConvertableFromSafeLong {}
+  implicit final val ConvertableFromULong = new ConvertableFromULong {}
   implicit final val ConvertableFromNumber = new ConvertableFromNumber {}
   implicit final val ConvertableFromNatural = new ConvertableFromNatural {}
 

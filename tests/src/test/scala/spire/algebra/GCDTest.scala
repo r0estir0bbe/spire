@@ -1,6 +1,6 @@
 package spire.algebra
 
-import spire.math.{ Rational, NumberTag }
+import spire.math.{ Rational, NumberTag, ULong }
 import spire.std.int._
 import spire.std.long._
 import spire.std.float._
@@ -28,6 +28,10 @@ class GCDTest extends FunSuite with Checkers {
     d <- arbitrary[Long] if d != 0
   } yield Rational(n, d))
 
+  implicit def ArbULong: Arbitrary[ULong] = Arbitrary(for {
+    n <- arbitrary[Long]
+  } yield ULong(n))
+
   def testGcd[A: EuclideanRing: IsReal: NumberTag](x: A, y: A): Boolean = {
     (x == Ring[A].zero || y == Ring[A].zero) || {
       val den = spire.math.gcd(x, y)
@@ -53,6 +57,7 @@ class GCDTest extends FunSuite with Checkers {
 
   test("Int GCD")(check(forAll { (a: Int, b: Int) => testGcd(a, b) }))
   test("Long GCD")(check(forAll { (a: Long, b: Long) => testGcd(a, b) }))
+  test("ULong GCD")(check(forAll { (a: ULong, b: ULong) => testGcd(a, b) }))
   test("Float GCD")(check(forAll { (a: Float, b: Float) => testGcd(a, b) }))
   test("Double GCD")(check(forAll { (a: Double, b: Double) => testGcd(a, b) }))
   // Disabled. Getting unexplainable OOM errors, even with isWhole commented out.
